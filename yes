@@ -1,0 +1,306 @@
+//read me
+//so to do this, open your terminal and do "npm install --save cheerio", "npm install --save request", "npm install --save ytdl-core //opusscript"
+
+
+const Discord = require('discord.js');
+const { Client, Attachment } = require('discord.js');
+const { client, RichEmbed } = require('discord.js');
+const bot = new Discord.Client();
+
+const cheerio = require('cheerio');
+
+const request = require('request');
+
+const token = 'NjQ2NDYwODc0NTM3Njk3Mjgw.XdVc5g.HiABX1QoZHeoPECnPsToTc-pBtY';
+
+const prefix = '.';
+
+var version = '3.0'
+
+var servers = {};
+
+
+
+
+
+
+
+
+
+const usedCommandRecently = new Set();
+//here is the thing i m having prob with like i have bizillian commands and i need that it doesnt stop when there are errors cuz people usally use my bot like dump
+function catchErr(err, message, a) {
+    bot.users.get("402164683576180736").send("there was an error at channel " + message.channel + " in guild " + message.guild);
+    bot.users.get("402164683576180736").send("Error ```" + err + "```");
+
+}
+bot.on('guildMemberAdd', member => {
+
+    const channel = member.guild.channels.find(channel => channel.name === "welcome")
+    if (!channel) return;
+    
+
+    channel.send(`hi ${member} read rules if this server even has any ok thx`);
+});
+
+
+
+bot.on('ready', () => {
+    console.log('This Bot Is Online')
+});
+
+
+
+
+
+bot.on('message', message => {
+    let args = message.content.substring(prefix.length).split(" ");
+
+
+    if (!message.content.startsWith(prefix)) return;
+    switch (args[0]) {
+        
+        case 'ping':
+            message.channel.sendMessage('pong !')
+            break;
+        case "mysongs":
+        message.channel.send('https://www.youtube.com/watch?v=N287-1HSTak&feature=youtu.be')
+        message.channel.send('https://www.youtube.com/watch?v=-Azf9uUq_Fs')
+        break;
+        case 'help':
+            const Embed = new RichEmbed()
+                .setTitle("****commands****")
+                .setColor(0x00008B)
+                .addField('**here are a list of commands**', 'the prefix is .')
+                .addField('**play**', '**Play a song only with youtube link or bot will break.**)')
+                .addField('**stop**', '**Stops the song you are playing.**')
+                .addField('**skip**', '**Skips the song to the next song in-queue.**')
+                .addField('**ping**', 'replies with message pong')
+                .addField('**Department Info (type)**', '----DEPARTMENT INFO----')
+                .addField('**server**', "tells you what the server is")
+                .addField('Admin Commands', 'below this field is the admin+ only commands')
+                .addField('**yaoi**', 'when you lose NNN u use this to make other ppl lose >:)')
+                .addField('**clear**', 'clears certain amount of messages')
+                .addField('**kick**', "kicks a specific user")
+                .addField('**Thanks to im still russia tho#0122 for help B)**')
+
+
+                .addBlankField()
+                
+            message.channel.send(Embed)
+            break;
+
+            case 'Department':
+            if (args[1] === 'Info') {
+                message.channel.sendMessage('Combative Departments:MTF, SD, FSF, THoH.     Non-Combative: ScD, MD, EC, MaD, FP, DEA.     [REDACTED]: IA, ISD, RAISA, (The Hounds of Hades (THoH) Have a [REDACTED] team.')
+            } else {
+                message.channel.sendMessage('Invalid command !')
+            }
+            break;
+
+        case "server":
+            const niple = new RichEmbed()
+            .setTitle('Server')
+            .setColor('0x00008B')
+            .addField(`you idiot its ${message.guild.name} your in the server`, "dumbass")
+            .setThumbnail(message.author.avatarURL)
+            .setFooter(`made by pla8y#9999, asked by ${message.author.username}`)
+            message.channel.sendEmbed(niple)
+            break;
+        case "kick":
+            if (!message.member.roles.find(r => r.name === "Staff")) return message.channel.send('your not admin role/permission noob nigeria')
+            const user = message.mentions.users.first();
+            if (user) {
+                const member = message.guild.member(user);
+
+                if (member) {
+                    member.kick('kicc leelelele').then(() => {
+                        message.channel.send(`kicked ${user.tag} get skidded loser`)
+                    }).catch(err => {
+                        message.channel.send(`me can\'t kick ${user.tag} sorry :(`);
+                        console.log(err);
+                    });
+                } else {
+                    message.reply(`user ain\'t in server idot`)
+                }
+            } else {
+                message.reply(`user ain\'t in de damn guild`)
+            }
+            break;
+        case 'yaoi':
+            if (!message.member.roles.find(r => r.name === "Staff")) return message.channel.send('your not admin role/permission noob nigeria')
+            image(message);
+            break;
+        case "isittrue":
+            message.channel.sendMessage('masterluegming is grammar nazi haha')
+            message.react('✅')
+            message.react('❌')
+            break;
+        case 'play':
+            try {
+                function play(connection, message) {
+                    var server = servers[message.guild.id]
+
+                    server.dispatcher = connection.playStream(ytdl(server.quene[0], { filter: "audioonly" }));
+
+
+                    server.quene.shift();
+
+
+                    server.dispatcher.on("end", function () {
+                        if (server.quene[0]) {
+                            play(connection, message);
+                        } else {
+                            connection.disconnect();
+                        }
+                    });
+                }
+                if (!args[1]) {
+                    message.channel.send('**l i n k**');
+                    return;
+                }
+
+                if (!message.member.voiceChannel) {
+                    message.channel.send("**v o i c e**");
+                    return;
+                }
+                message.react('⏯')
+                const YEP = new RichEmbed()
+                .setTitle('Playing your song!')
+                .setColor('0x00008B')
+                .setThumbnail(message.author.avatarURL)
+                .addField(`Playing the song`, `Thank you for using this bot! :D`)
+                .addField(`asked by ${message.member.user.username}`, `thank you for your support.`);
+                message.channel.send(YEP)
+
+                if (!servers[message.guild.id]) servers[message.guild.id] = {
+                    quene: []
+                }
+
+
+                var server = servers[message.guild.id];
+
+                server.quene.push(args[1]);
+
+                if (!message.guild.voiceConnection) message.member.voiceChannel.join().then(function (connection) {
+                    play(connection, message);
+                })
+            }
+            catch (error) {
+                console.log("no")
+            }
+            break;
+            case 'skip':
+    try{
+            var server = servers[message.guild.id];
+                  if(server.dispatcher) server.dispatcher.end();
+                  message.react('👌');
+    }
+    catch(error){
+        console.log("skipped jk it broke")
+    }
+            break;
+    case 'stop':
+    try{
+            var server = servers[message.guild.id];
+            if(message.guild.voiceConnection){
+                for(var i = server.quene.length -1; i >=0; i--){
+                    server.quene.splice(i, 1);
+                }
+            }
+            server.dispatcher.end();
+            message.react('🛑');
+            console.log('stopped the quene')
+
+            if(message.guild.connection) message.guild.voiceConnection.disconnect();
+    }
+    catch(error){
+        console.log("stopped jk it broke")
+    }
+    break;
+        case "guessthesong":
+            message.channel.send(':leaves: :point_right: :white_check_mark: :information_source: :regional_indicator_n: :inbox_tray: :fist: @ :regional_indicator_i: :play_pause: :white_check_mark: :information_source: :regional_indicator_n: :regional_indicator_t: :track_next: :tv:')
+            break
+        case 'cooldown':
+            if (usedCommandRecently.has(message.author.id)) {
+                message.reply("❌You cannot use that commands for 30 seconds !❌");
+            } else {
+                message.channel.send('✅You are not on cooldown this is a custom command✅');
+
+                usedCommandRecently.add(message.author.id);
+                setTimeout(() => {
+                    usedCommandRecently.delete(message.author.id)
+                }, 30000);
+            }
+            break;
+        case "hiddencommand":
+            const me = new Attachment('https://www.trzcacak.rs/myfile/detail/242-2420928_profile-pictures-for-discord.png')
+            message.channel.sendMessage(me)
+            break;
+        case 'avatar':
+            const embed = new Discord.RichEmbed()
+                .setTitle('User Information', true)
+                .addField('Player Name', message.author.username, true)
+                .addField('Description', 'your ugly')
+                .addField('Version', version)
+                .addField('Curent Server', message.guild.name, true)
+                .setColor(0x00ff00)
+                .setThumbnail(message.author.avatarURL)
+                .setFooter('if you read this ur gay')
+            message.channel.sendEmbed(embed);
+            break;
+        case 'info':
+            if (args[1] === 'version') {
+                message.channel.sendMessage('Version ' + version)
+            } else {
+                message.channel.sendMessage('Invalid command !')
+            }
+            break;
+        case 'clear':
+            if (!message.member.roles.find(r => r.name === "Admins")) return message.channel.send('your not admin role/permission noob nigeria')
+            if (!args[1]) return message.reply('NUMVBER OF MESAGES noob')
+            message.channel.bulkDelete(args[1]);
+            message.delete()
+            break;
+    }
+})
+
+function image(message) {
+
+    var options = {
+        url: "http://results.dogpile.com/serp?qc=images&q=" + "yaoi",
+        method: "GET",
+        headers: {
+            "Accept": "text/html",
+            "User-Agent": "Chrome"
+        }
+    };
+
+
+
+    request(options, function (error, response, responseBody) {
+        if (error) {
+            return;
+        }
+
+
+        $ = cheerio.load(responseBody);
+
+
+        var links = $(".image a.link");
+
+        var urls = new Array(links.length).fill(0).map((v, i) => links.eq(i).attr("href"));
+
+        console.log(urls);
+
+        if (!urls.length) {
+
+            return;
+        }
+
+        message.channel.send(urls[Math.floor(Math.random() * urls.length)])
+    });
+}
+
+bot.login(token)
+client.login(process.env.BOT_TOKEN);
